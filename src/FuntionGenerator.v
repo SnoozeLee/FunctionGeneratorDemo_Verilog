@@ -1,13 +1,19 @@
 module FuntionGenerator(
-    input clk,
+    input clk_50MHz,
     input rstn,                     // 0-复位(停止输出)  1-正常输出
     input [1:0] wave_select,        // 选择波形
     // input [7:0] phase_init,		// 初相位
-    input [7:0] f_step, 		    // 频率步长
+    input [1:0] gears, 		        // 档位(频率)控制
 
     output [9:0] data_out,          // 电平输出
     output reg data_out_en              // 可能需要用到的D/A开关
 );
+
+// 分频时钟线
+wire clk;
+
+// 频率步长
+wire [7:0] f_step;
 
 // 相位累加器
 reg phase_en;                   // 相位累加器使能
@@ -37,6 +43,17 @@ always @(negedge rstn or posedge clk) begin
         data_out_en = 1;
     end
 end
+
+Divider2000 divider2000_1(
+    .clkIn (clk_50MHz),
+    .clkOut (clk)
+);
+
+FrequencyControl frequency_control_1 (
+    .gears (gears),
+    .f_step (f_step)
+);
+
 PhaseCounter phase_counter_1(
     .clk (clk),
     .en (phase_en),
