@@ -7,13 +7,37 @@ module ROM(
 
     output [9:0] amplitude // 输出波形 0-1023
 );
-wire [9:0] amp_out;  // amplitude 输出波形前先在第一个clk到来时把幅值信号计算好放在这
+wire [9:0] amp_out_cos;  // amplitude 输出波形前先在第一个clk到来时把幅值信号计算好放在这
+wire [9:0] amp_out_tri;  // amplitude 输出波形前先在第一个clk到来时把幅值信号计算好放在这
+wire [9:0] amp_out_tri_rev;  // amplitude 输出波形前先在第一个clk到来时把幅值信号计算好放在这
+wire [9:0] amp_out_square;  // amplitude 输出波形前先在第一个clk到来时把幅值信号计算好放在这
 reg [1:0] en_wait;  // en_wait[0]高电平时计算幅值 en_wait[1]高电平时才输出
 Cos_ROM cosrom_1(
     .clk (clk),
-    .en (en_wait[0] & (select==2'b11)),
+    .en (en_wait[0] & (select == 2'b11)),
     .addr (phase_in),
-    .q (amp_out)
+    .q (amp_out_cos)
+);
+
+Square_ROM squarerom_1(
+    .clk (clk),
+    .en (en_wait[0] & (select == 2'b10)),
+    .addr (phase_in),
+    .q (amp_out_square)
+);
+
+Triangle_ROM trianglerom_1(
+    .clk (clk),
+    .en (en_wait[0] & (select == 2'b00)),
+    .addr (phase_in),
+    .q (amp_out_tri)
+);
+
+Triangle_Reverse_ROM triangle_reverse_rom_1(
+    .clk (clk),
+    .en (en_wait[0] & (select == 2'b01)),
+    .addr (phase_in),
+    .q (amp_out_tri_rev)
 );
 
 always @(posedge clk or negedge rstn) begin
@@ -23,12 +47,12 @@ always @(posedge clk or negedge rstn) begin
     end
 end
 
-assign amplitude = en_wait[1]? amp_out : 10'b0;
+assign amplitude = en_wait[1]?
+    (amp_out_cos|amp_out_tri|amp_out_tri_rev|amp_out_square) : 10'b0;     // 第一个时钟上升沿不输出
 
 endmodule
 
 module Triangle_ROM (
-// module ROM (    // 测试行
     input clk,
     input en,
     input [7:0] addr,   // 0-255
@@ -52,7 +76,6 @@ assign q = {data_out, 3'b0};
 endmodule
 
 module Triangle_Reverse_ROM (
-// module ROM (    // 测试行
     input clk,
     input en,
     input [7:0] addr,   // 0-255
@@ -86,7 +109,7 @@ reg data_out;
 always @(posedge clk or negedge en) begin
     if(!en) begin data_out <= 8'b0; end
     else if(clk) begin 
-        if(0<addr<=8'd128) begin data_out <= 1'b1; end
+        if(0<addr && addr<=8'd128) begin data_out <= 1'b1; end
         else begin data_out <= 1'b0; end
     end
 end
@@ -105,78 +128,77 @@ module Cos_ROM (
 // reg [8:0] ROM_t [0 : 64];
 reg [8:0] ROM_t [0 : 64];
 initial begin
-ROM_t[0] = 9'd511;
-ROM_t[1] = 9'd510;
-ROM_t[2] = 9'd510;
-ROM_t[3] = 9'd509;
-ROM_t[4] = 9'd508;
-ROM_t[5] = 9'd507;
-ROM_t[6] = 9'd505;
-ROM_t[7] = 9'd503;
-ROM_t[8] = 9'd501;
-ROM_t[9] = 9'd498;
+    ROM_t[0] = 9'd511;
+    ROM_t[1] = 9'd510;
+    ROM_t[2] = 9'd510;
+    ROM_t[3] = 9'd509;
+    ROM_t[4] = 9'd508;
+    ROM_t[5] = 9'd507;
+    ROM_t[6] = 9'd505;
+    ROM_t[7] = 9'd503;
+    ROM_t[8] = 9'd501;
+    ROM_t[9] = 9'd498;
 
-ROM_t[10] = 9'd495;
-ROM_t[11] = 9'd492;
-ROM_t[12] = 9'd488;
-ROM_t[13] = 9'd485;
-ROM_t[14] = 9'd481;
-ROM_t[15] = 9'd476;
-ROM_t[16] = 9'd472;
-ROM_t[17] = 9'd467;
-ROM_t[18] = 9'd461;
-ROM_t[19] = 9'd456;
+    ROM_t[10] = 9'd495;
+    ROM_t[11] = 9'd492;
+    ROM_t[12] = 9'd488;
+    ROM_t[13] = 9'd485;
+    ROM_t[14] = 9'd481;
+    ROM_t[15] = 9'd476;
+    ROM_t[16] = 9'd472;
+    ROM_t[17] = 9'd467;
+    ROM_t[18] = 9'd461;
+    ROM_t[19] = 9'd456;
 
-ROM_t[20] = 9'd450;
-ROM_t[21] = 9'd444;
-ROM_t[22] = 9'd438;
-ROM_t[23] = 9'd431;
-ROM_t[24] = 9'd424;
-ROM_t[25] = 9'd417;
-ROM_t[26] = 9'd410;
-ROM_t[27] = 9'd402;
-ROM_t[28] = 9'd395;
-ROM_t[29] = 9'd386;
+    ROM_t[20] = 9'd450;
+    ROM_t[21] = 9'd444;
+    ROM_t[22] = 9'd438;
+    ROM_t[23] = 9'd431;
+    ROM_t[24] = 9'd424;
+    ROM_t[25] = 9'd417;
+    ROM_t[26] = 9'd410;
+    ROM_t[27] = 9'd402;
+    ROM_t[28] = 9'd395;
+    ROM_t[29] = 9'd386;
 
-ROM_t[30] = 9'd378;
-ROM_t[31] = 9'd370;
-ROM_t[32] = 9'd361;
-ROM_t[33] = 9'd352;
-ROM_t[34] = 9'd343;
-ROM_t[35] = 9'd333;
-ROM_t[36] = 9'd324;
-ROM_t[37] = 9'd314;
-ROM_t[38] = 9'd304;
-ROM_t[39] = 9'd294;
+    ROM_t[30] = 9'd378;
+    ROM_t[31] = 9'd370;
+    ROM_t[32] = 9'd361;
+    ROM_t[33] = 9'd352;
+    ROM_t[34] = 9'd343;
+    ROM_t[35] = 9'd333;
+    ROM_t[36] = 9'd324;
+    ROM_t[37] = 9'd314;
+    ROM_t[38] = 9'd304;
+    ROM_t[39] = 9'd294;
 
-ROM_t[40] = 9'd283;
-ROM_t[41] = 9'd273;
-ROM_t[42] = 9'd262;
-ROM_t[43] = 9'd251;
-ROM_t[44] = 9'd240;
-ROM_t[45] = 9'd229;
-ROM_t[46] = 9'd218;
-ROM_t[47] = 9'd207;
-ROM_t[48] = 9'd195;
-ROM_t[49] = 9'd183;
+    ROM_t[40] = 9'd283;
+    ROM_t[41] = 9'd273;
+    ROM_t[42] = 9'd262;
+    ROM_t[43] = 9'd251;
+    ROM_t[44] = 9'd240;
+    ROM_t[45] = 9'd229;
+    ROM_t[46] = 9'd218;
+    ROM_t[47] = 9'd207;
+    ROM_t[48] = 9'd195;
+    ROM_t[49] = 9'd183;
 
-ROM_t[50] = 9'd172;
-ROM_t[51] = 9'd160;
-ROM_t[52] = 9'd148;
-ROM_t[53] = 9'd136;
-ROM_t[54] = 9'd124;
-ROM_t[55] = 9'd111;
-ROM_t[56] = 9'd99;
-ROM_t[57] = 9'd87;
-ROM_t[58] = 9'd74;
-ROM_t[59] = 9'd62;
+    ROM_t[50] = 9'd172;
+    ROM_t[51] = 9'd160;
+    ROM_t[52] = 9'd148;
+    ROM_t[53] = 9'd136;
+    ROM_t[54] = 9'd124;
+    ROM_t[55] = 9'd111;
+    ROM_t[56] = 9'd99;
+    ROM_t[57] = 9'd87;
+    ROM_t[58] = 9'd74;
+    ROM_t[59] = 9'd62;
 
-ROM_t[60] = 9'd50;
-ROM_t[61] = 9'd37;
-ROM_t[62] = 9'd25;
-ROM_t[63] = 9'd12;
-ROM_t[64] = 9'd0;
-
+    ROM_t[60] = 9'd50;
+    ROM_t[61] = 9'd37;
+    ROM_t[62] = 9'd25;
+    ROM_t[63] = 9'd12;
+    ROM_t[64] = 9'd0;
 end
 // reg [8:0] ROM_t [0 : 64] = '{
 // 9'd511, 9'd510, 9'd510, 9'd509, 9'd508, 9'd507, 9'd505, 9'd503,
@@ -189,7 +211,6 @@ end
 // 9'd99 , 9'd87 , 9'd74 , 9'd62 , 9'd50 , 9'd37 , 9'd25 , 9'd12 ,
 // 9'd0};
 //as the symmetry of cos function, just store 1/4 data of one cycle
-
 
 always @(posedge clk) begin
     if (en) begin
@@ -207,13 +228,11 @@ always @(posedge clk) begin
         end
     end
     else begin
-        q <= 'b0 ;
+        q <= 10'b0 ;
     end
 end
 
-
-
-/* 原定方案
+/* 原定方案 - 出bug
 reg [9:0] amplitude;    // 幅值 0-1024
 // wire [9:0] ROM_t [0 : 64] ;
 integer ROM_t[0:64] = {
