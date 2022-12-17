@@ -1,6 +1,6 @@
 module PhaseCounter(
     input clk,
-    input en,
+    input en,              // 0-初始化 1-正常计数
     input [7:0] init_phase,     // 初始相位
     input [7:0] step,    // 步长，用以控制频率
 

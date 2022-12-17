@@ -1,6 +1,5 @@
 module ROM(
     input clk,
-    input rstn,           // 复位
     input en,       
     input [1:0] select,   // 选择波形 00-三角波 01-反三角波 10-方波 11-余弦波
     input [7:0] phase_in,   // 输入相位
@@ -40,8 +39,8 @@ Triangle_Reverse_ROM triangle_reverse_rom_1(
     .q (amp_out_tri_rev)
 );
 
-always @(posedge clk or negedge rstn) begin
-    if(!rstn) begin en_wait <= 2'b00; end
+always @(posedge clk or negedge en) begin
+    if(!en) begin en_wait <= 2'b00; end
     else begin 
         en_wait = {en_wait[0], en}; // 延期一个时钟信号
     end
