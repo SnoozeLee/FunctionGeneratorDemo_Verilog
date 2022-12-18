@@ -1,4 +1,4 @@
-module Divider2000(
+module Divider200(
     input clkIn,
     output reg clkOut,
     output [10:0] statenow

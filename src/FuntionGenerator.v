@@ -45,9 +45,9 @@ always @(negedge rstn or posedge clk) begin
     end
 end
 
-assign data_clk = clk;
+assign data_clk = clk_50MHz;
 
-Divider2000 divider2000_1(
+Divider200 divider200_1(
     .clkIn (clk_50MHz),
     .clkOut (clk)
 );
