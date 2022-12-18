@@ -61,17 +61,18 @@ module Triangle_ROM (
 reg [7:0] data_out;
 always @(posedge clk or negedge en) begin
     if(!en) begin
-       data_out <= 7'b0;
+       data_out <= 8'b0;
     end 
     else begin 
-        if ( addr<8'd128 ) begin
-            data_out <= addr;
-        end else begin
-            data_out <= 0;
-        end
+        // if ( addr<8'd128 ) begin
+        //     data_out <= addr;
+        // end else begin
+        //     data_out <= 0;
+        // end
+        data_out <= addr;
     end
 end
-assign q = {data_out, 3'b0};
+assign q = {data_out, 2'b0};
 endmodule
 
 module Triangle_Reverse_ROM (
@@ -84,17 +85,18 @@ module Triangle_Reverse_ROM (
 reg [7:0] data_out;
 always @(posedge clk or negedge en) begin
     if(!en) begin
-       data_out <= 7'b0;
+       data_out <= 8'b0;
     end 
     else begin 
-        if ( addr<8'd128 ) begin
-            data_out <= 8'd128-addr;
-        end else begin
-            data_out <= 0;
-        end
+        // if ( addr<8'd128 ) begin
+        //     data_out <= 8'd128-addr;
+        // end else begin
+        //     data_out <= 0;
+        // end
+        data_out <= 8'd255-addr; 
     end
 end
-assign q = {data_out, 3'b0};
+assign q = {data_out, 2'b0};
 endmodule
 
 module Square_ROM (
