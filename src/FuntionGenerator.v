@@ -6,8 +6,8 @@ module FuntionGenerator(
     input [1:0] gears, 		        // 档位(频率)控制
 
     output [9:0] data_out,          // 电平输出
-    output reg data_out_en,              // 可能需要用到的D/A开关
-    output data_clk                // 供D/A时钟
+    output reg data_out_en,         // 可能需要用到的D/A开关
+    output data_clk                 // 供D/A时钟
 );
 
 // 分频时钟线

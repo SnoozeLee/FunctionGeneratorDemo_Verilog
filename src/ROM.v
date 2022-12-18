@@ -114,7 +114,8 @@ always @(posedge clk or negedge en) begin
         else begin data_out <= 1'b0; end
     end
 end
-assign q = {data_out, 9'b0};
+// assign q = {data_out, 9'b0};
+assign q = (data_out == 1'b1)? 10'd1023 : 10'd0;
 
 endmodule
 
