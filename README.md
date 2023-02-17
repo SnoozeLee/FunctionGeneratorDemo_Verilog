@@ -15,7 +15,7 @@ module FuntionGenerator(
     input rstn,                     // 0-复位(停止输出)  1-正常输出
     input [1:0] wave_select,        // 选择波形 00-三角波 01-反三角波 10-方波 11-余弦波
     input [1:0] gears, 		        // 档位(频率)控制 11 01 00 10 -> 10KHz 4kHz 2kHz 1kHz
-    output [9:0] data_out,          // 电平输出(不足10位时取高位信号)
+    output [7:0] data_out,          // 电平输出(不足10位时取高位信号)
     output reg data_out_en,         // 可能需要用到的D/A开关
     output data_clk                 // 供D/A时钟
 );

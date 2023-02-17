@@ -5,7 +5,7 @@ module FuntionGenerator(
     // input [7:0] phase_init,		// 初相位
     input [1:0] gears, 		        // 档位(频率)控制
 
-    output [9:0] data_out,          // 电平输出
+    output [7:0] data_out,          // 电平输出
     output reg data_out_en,         // 可能需要用到的D/A开关
     output data_clk                 // 供D/A时钟
 );
@@ -23,6 +23,9 @@ wire [7:0] phase_state;         // 累加器输出相位
 
 // ROM表 
 reg wave_en;                // ROM表使能
+
+// data输出中继线
+wire [9:0] rom_data_out;
 
 initial begin
     phase_en = 0;
@@ -46,6 +49,7 @@ always @(negedge rstn or posedge clk) begin
 end
 
 assign data_clk = clk_50MHz;
+assign data_out = rom_data_out[9:2];
 
 Divider200 divider200_1(
     .clkIn (clk_50MHz),
@@ -70,7 +74,7 @@ ROM rom_1(
     .en (wave_en),
     .select (wave_select),          // 选择波形
     .phase_in (phase_state),        // 输入相位
-    .amplitude (data_out)           // 输出电平(波形)
+    .amplitude (rom_data_out)           // 输出电平(波形)
 );
 
 endmodule
